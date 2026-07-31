@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>三国咸话 - 桌面壁纸专区产品文档</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0e0e10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+    padding: 20px;
+    background-image:
+      radial-gradient(at 20% 20%, rgba(95,229,216,0.05) 0px, transparent 50%),
+      radial-gradient(at 80% 80%, rgba(180,140,255,0.05) 0px, transparent 50%);
+  }
+
+  /* 顶部说明 */
+  .top-tip {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(95, 229, 216, 0.95);
+    color: #000;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(95,229,216,0.3);
+  }
+
+  /* 手机框架 */
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: linear-gradient(145deg, #2a2a2e 0%, #0a0a0a 100%);
+    border-radius: 50px;
+    padding: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 28px;
+    background: #000;
+    border-radius: 14px;
+    z-index: 100;
+  }
+  .screen {
+    width: 100%;
+    height: 100%;
+    background: #1a1a1f;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 状态栏 */
+  .status-bar {
+    height: 54px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px 0;
+    font-size: 15px;
+    font-weight: 600;
+    position: relative;
+    z-index: 10;
+  }
+  .status-bar.light { color: #fff; }
+
+  /* 页面 */
+  .page {
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .page.hidden { opacity: 0; pointer-events: none; transform: scale(1.02); }
+
+  /* ========== 主页面 ========== */
+  .main-page { padding-top: 54px; }
+
+  /* Tab */
+  .tab-bar {
+    display: flex;
+    gap: 28px;
+    padding: 8px 24px 14px;
+  }
+  .tab {
+    font-size: 18px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    padding-bottom: 6px;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .tab.active {
+    color: #5FE5D8;
+    border-bottom-color: #5FE5D8;
+  }
+
+  /* IP 横向滚动 */
+  .ip-tags-wrap {
+    position: relative;
+  }
+  .ip-tags-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(90deg, transparent, #1a1a1f);
+    pointer-events: none;
+  }
+  .ip-tags {
+    display: flex;
+    gap: 8px;
+    padding: 4px 24px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ip-tags::-webkit-scrollbar { display: none; }
+  .ip-tag {
+    padding: 7px 16px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .ip-tag.active {
+    background: rgba(95, 229, 216, 0.18);
+    color: #5FE5D8;
+    border-color: rgba(95,229,216,0.4);
+  }
+
+  /* 瀑布流 —— 2×2 长方形填满首屏 */
+  .wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 12px 12px 24px;
+    overflow: hidden;
+    height: calc(100% - 130px);
+  }
+  .wallpaper-grid::-webkit-scrollbar { display: none; }
+
+  .wallpaper-card {
+    aspect-ratio: 9/16;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .wallpaper-card:active { transform: scale(0.96); }
+
+  /* 平铺：纯图卡片，零文字叠加 */
+  .play-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 13px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 11px;
+    padding-left: 2px;
+  }
+
+  /* ========== 左侧悬浮按钮（已下载入口） ========== */
+  .fab {
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(20,20,25,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(95,229,216,0.4);
+    border-left: none;
+    border-radius: 0 14px 14px 0;
+    padding: 14px 8px 14px 6px;
+    cursor: pointer;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 4px 0 16px rgba(0,0,0,0.3);
+    transition: all 0.2s;
+  }
+  .fab:active { transform: translateY(-50%) scale(0.95); background: rgba(95,229,216,0.15); }
+  .fab-icon {
+    font-size: 18px;
+    color: #5FE5D8;
+  }
+  .fab-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  /* ========== 预览页 ========== */
+  .preview-page { background: #000; }
+  .preview-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 24px 60px;
+    position: relative;
+  }
+  .preview-bg::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 320px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    z-index: 1;
+  }
+  .preview-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    display: none;
+  }
+  .preview-video.show { display: block; }
+  .preview-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+  }
+
+  /* 平台切换器 */
+  .platform-tabs {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+  .platform-tab {
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.2s;
+  }
+  .platform-tab.active {
+    background: rgba(95,229,216,0.9);
+    color: #000;
+    border-color: rgba(95,229,216,0.6);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 16px;
+  }
+
+  /* iOS 提示 */
+  .ios-hint {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: rgba(255,193,7,0.15);
+    border: 1px solid rgba(255,193,7,0.35);
+    border-radius: 8px;
+    font-size: 11px;
+    color: rgba(255,213,79,0.95);
+    line-height: 1.4;
+    display: none;
+  }
+  .ios-hint.show { display: block; }
+
+  /* 进度条 */
+  .progress-wrap {
+    margin-top: 14px;
+    height: 4px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .progress-wrap.show { opacity: 1; }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #5FE5D8, #3DBDB0);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px rgba(95,229,216,0.5);
+  }
+  .progress-text {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+    min-height: 14px;
+  }
+  .preview-info {
+    position: relative;
+    z-index: 2;
+  }
+  .preview-name {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .preview-meta {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-bottom: 20px;
+  }
+  .preview-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .set-btn {
+    background: linear-gradient(135deg, #5FE5D8 0%, #3DBDB0 100%);
+    color: #001818;
+    padding: 14px 24px;
+    border-radius: 28px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(95,229,216,0.4);
+    transition: transform 0.15s;
+  }
+  .set-btn:active { transform: scale(0.97); }
+  .downloaded-tabs {
+    display: flex;
+    gap: 24px;
+    padding: 0 24px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .downloaded-tab {
+    position: relative;
+    padding: 4px 0 9px;
+    color: rgba(255,255,255,0.48);
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .downloaded-tab.active {
+    color: #5FE5D8;
+    font-weight: 600;
+  }
+  .downloaded-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -13px;
+    height: 2px;
+    border-radius: 2px;
+    background: #5FE5D8;
+  }
+
+  /* ========== 已下载页 ========== */
+  .downloaded-page { padding-top: 54px; }
+  .page-header {
+    padding: 8px 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+  .back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .back-btn:active { background: rgba(255,255,255,0.16); }
+  .page-title {
+    font-size: 18px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .page-count {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+  }
+  .downloaded-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 12px 12px 24px;
+    overflow: hidden;
+    height: calc(100% - 140px);
+  }
+  .downloaded-grid::-webkit-scrollbar { display: none; }
+  .empty-state {
+    grid-column: span 2;
+    text-align: center;
+    padding: 80px 20px;
+    color: rgba(255,255,255,0.4);
+  }
+  .empty-icon { font-size: 48px; opacity: 0.4; margin-bottom: 12px; }
+  .empty-tip { font-size: 13px; line-height: 1.8; }
+
+  /* 壁纸渐变（模拟角色配色 —— 平铺无叠加） */
+  .wp-1  { background: linear-gradient(180deg, #2c1810 0%, #6b3410 35%, #c97232 70%, #e89a4a 100%); }
+  .wp-2  { background: linear-gradient(180deg, #1a0830 0%, #4b0082 35%, #8e24aa 70%, #c2185b 100%); }
+  .wp-3  { background: linear-gradient(180deg, #0a1a0a 0%, #1a4a1a 35%, #2e7d32 70%, #66bb6a 100%); }
+  .wp-4  { background: linear-gradient(180deg, #0c1a2c 0%, #16213e 35%, #0f3460 70%, #2e5c8a 100%); }
+  .wp-5  { background: linear-gradient(180deg, #0e0e0e 0%, #2d1d10 35%, #3d2817 70%, #6d4c41 100%); }
+  .wp-6  { background: linear-gradient(180deg, #1c0606 0%, #5c1a1a 35%, #b71c1c 70%, #e53935 100%); }
+  .wp-7  { background: linear-gradient(180deg, #0a1c2c 0%, #1a4a5e 35%, #0277bd 70%, #4fc3f7 100%); }
+  .wp-8  { background: linear-gradient(180deg, #2c1a3c 0%, #5e3a7e 35%, #8e24aa 70%, #ba68c8 100%); }
+  .wp-9  { background: linear-gradient(180deg, #1c1c0e 0%, #5e5a1a 35%, #9e9d24 70%, #cddc39 100%); }
+  .wp-10 { background: linear-gradient(180deg, #2c0c1c 0%, #7e2858 35%, #ad1457 70%, #ec407a 100%); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(95,229,216,0.95);
+    color: #000;
+    padding: 12px 20px;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    white-space: pre-line;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .permission-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+    background: rgba(0,0,0,0.5);
+  }
+  .permission-overlay.show { display: flex; }
+  .permission-card {
+    width: 100%;
+    padding: 24px 20px 28px;
+    background: #25252b;
+    border-radius: 22px 22px 0 0;
+  }
+  .permission-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .permission-desc {
+    color: rgba(255,255,255,0.62);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+  .permission-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .permission-btn {
+    flex: 1;
+    border: 0;
+    border-radius: 22px;
+    padding: 12px 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .permission-btn.cancel {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.78);
+  }
+  .permission-btn.allow {
+    background: #5FE5D8;
+    color: #001818;
+    font-weight: 700;
+  }
+
+  .doc-notes {
+    width: 500px;
+    max-height: 844px;
+    overflow-y: auto;
+    padding: 26px;
+    margin-left: 28px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    background: rgba(28,28,34,0.96);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+  .doc-notes h1 { font-size: 24px; margin-bottom: 8px; }
+  .doc-subtitle { color: #5FE5D8; font-size: 13px; margin-bottom: 22px; }
+  .doc-section { padding: 17px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+  .doc-section:first-of-type { border-top: 0; }
+  .doc-section h2 { font-size: 16px; margin-bottom: 9px; }
+  .doc-section p, .doc-section li { color: rgba(255,255,255,0.68); font-size: 13px; line-height: 1.75; }
+  .doc-section ul, .doc-section ol { padding-left: 20px; }
+  .decision {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-left: 3px solid #5FE5D8;
+    border-radius: 6px;
+    background: rgba(95,229,216,0.08);
+    color: rgba(255,255,255,0.8);
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .doc-notes::-webkit-scrollbar { width: 5px; }
+  .doc-notes::-webkit-scrollbar-thumb { background: rgba(95,229,216,0.3); border-radius: 3px; }
+  @media (max-width: 980px) {
+    body { align-items: flex-start; flex-direction: column; padding-top: 70px; overflow: auto; }
+    .phone { margin: 0 auto; flex-shrink: 0; }
+    .doc-notes { width: min(390px, calc(100vw - 40px)); max-height: none; margin: 24px auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-tip">三国咸话 · 桌面壁纸专区产品交互文档</div>
+
+<div class="phone">
+  <div class="screen">
+
+    <!-- ============ 主页面 ============ -->
+    <div class="page main-page" id="mainPage">
+      <div class="status-bar light">
+        <span>10:42</span>
+        <span>📶 5G 🔋 62%</span>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab" data-tab="dynamic">动态</div>
+        <div class="tab active" data-tab="static">静态</div>
+      </div>
+
+      <div class="ip-tags-wrap">
+        <div class="ip-tags" id="ipTags">
+          <div class="ip-tag active" data-ip="all">全部</div>
+          <div class="ip-tag" data-ip="steam">蒸蒸茶馆</div>
+          <div class="ip-tag" data-ip="sgs">三国杀</div>
+          <div class="ip-tag" data-ip="new">新游速递</div>
+          <div class="ip-tag" data-ip="yxx">游小婵</div>
+        </div>
+      </div>
+
+      <div class="wallpaper-grid" id="grid"></div>
+
+      <!-- 左侧悬浮按钮：已下载入口 -->
+      <div class="fab" onclick="showPage('downloadedPage')">
+        <div class="fab-icon">📥</div>
+        <div class="fab-text">已下载</div>
+      </div>
+    </div>
+
+    <!-- ============ 预览页 ============ -->
+    <div class="page preview-page hidden" id="previewPage">
+      <div class="status-bar light">
+        <span>10:42</span>
+        <span>📶 5G 🔋 62%</span>
+      </div>
+      <div class="preview-bg" id="previewBg">
+        <video id="previewVideo" class="preview-video" loop muted playsinline autoplay preload="auto"></video>
+
+        <!-- 平台切换器 -->
+        <div class="platform-tabs">
+          <div class="platform-tab active" data-platform="android">Android</div>
+          <div class="platform-tab" data-platform="ios">iOS</div>
+        </div>
+
+        <!-- 关闭按钮 -->
+        <div class="close-btn" onclick="closePreview()">✕</div>
+
+        <!-- 底部信息区 -->
+        <div class="preview-info">
+          <div class="preview-name" id="previewName">--</div>
+          <div class="preview-meta" id="previewMeta">--</div>
+
+          <!-- iOS 提示 -->
+          <div class="ios-hint" id="iosHint">📱 iOS 端：将下载实况壁纸资源并保存到相册，动态效果仅支持锁屏</div>
+
+          <!-- 进度条 -->
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-text" id="progressText"></div>
+
+          <!-- 按钮 -->
+          <div class="preview-actions">
+            <div class="set-btn" id="setBtn">点击下载并设置为壁纸</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 已下载页 ============ -->
+    <div class="page downloaded-page hidden" id="downloadedPage">
+      <div class="status-bar light">
+        <span>10:42</span>
+        <span>📶 5G 🔋 62%</span>
+      </div>
+      <div class="page-header">
+        <div class="back-btn" onclick="showPage('mainPage')">‹</div>
+        <div class="page-title">已下载壁纸</div>
+        <div class="page-count" id="dlCount">0 张</div>
+      </div>
+      <div class="downloaded-tabs">
+        <div class="downloaded-tab active" data-downloaded-tab="static">静态</div>
+        <div class="downloaded-tab" data-downloaded-tab="dynamic">动态</div>
+      </div>
+      <div class="downloaded-grid" id="downloadedGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<aside class="doc-notes">
+  <h1>桌面壁纸专区</h1>
+  <div class="doc-subtitle">一期产品交互与规则说明</div>
+
+  <section class="doc-section">
+    <h2>1. 功能入口与登录</h2>
+    <ul>
+      <li>专区入口位于 APP 首页，由运营配置曝光。</li>
+      <li>用户点击入口时必须先完成登录，不允许游客浏览或下载。</li>
+      <li>登录成功后自动进入壁纸专区；登录取消或失败则停留在当前页面。</li>
+      <li>服务端频道、列表、详情和下载接口必须再次验证登录态，不得仅依赖客户端状态。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>2. 首页浏览</h2>
+    <ul>
+      <li>一级分类固定为"静态 / 动态"，首次进入默认选中"静态"。</li>
+      <li>频道 Tab 按后台 <code>sort_order</code> 升序展示，"全部"固定在首位。</li>
+      <li>频道名称完全由后台配置，客户端不得写死。</li>
+      <li>默认选中"全部"频道；切换类型后重置为"全部"。</li>
+      <li>原频道在新类型中不存在时，自动回退到"全部"。</li>
+      <li>频道启用且当前类型下至少有一张有效已发布壁纸时才展示。</li>
+      <li>一张壁纸只能绑定一个频道，且只能是静态或动态其中一种类型。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>3. Android 流程</h2>
+    <h3>静态壁纸</h3>
+    <ol>
+      <li>下载图片 → 校验版本/大小/哈希 → 写入本地索引。</li>
+      <li>通过 WallpaperManager 设置桌面，一期不提供锁屏或同时设置选项。</li>
+    </ol>
+    <h3>动态壁纸</h3>
+    <ol>
+      <li>下载 H.264 MP4 → 校验 → 写入本地索引 → 启动 WallpaperService。</li>
+      <li>本地循环播放 MP4，屏幕关闭或壁纸不可见时暂停解码以节省资源。</li>
+      <li>服务启动、解码或系统确认失败时，不得向用户报告成功。</li>
+    </ol>
+    <div class="decision">Android 下载完成按钮：已下载，设置为桌面。一期静态和动态均只支持桌面，不支持锁屏。</div>
+  </section>
+
+  <section class="doc-section">
+    <h2>4. iOS 静态壁纸</h2>
+    <ol>
+      <li>用户点击保存图片。</li>
+      <li>首次保存前申请照片添加权限。</li>
+      <li>下载并校验图片，保存至系统相册。</li>
+      <li>提示用户前往"设置 → 墙纸"手动应用。</li>
+    </ol>
+    <div class="decision">完成状态必须描述为"已保存到相册"，不得描述为"已设置壁纸"。</div>
+  </section>
+
+  <section class="doc-section">
+    <h2>5. iOS 动态壁纸</h2>
+    <ol>
+      <li>服务端预生成约 3 秒 Live Photo 配对资源（一张静态封面图 + 一段配对视频）。</li>
+      <li>用户点击"下载并生成实况壁纸"。</li>
+      <li>首次执行时展示权限用途说明并请求相册权限。</li>
+      <li>下载配对资源并校验，展示"正在下载实况壁纸资源"和"正在保存实况壁纸到相册"进度。</li>
+      <li>使用 Photos 框架将图片和 paired video 写入系统相册。</li>
+      <li>用户手动进入"设置 → 墙纸"完成应用。</li>
+    </ol>
+    <div class="decision">APP 不得承诺直接设置系统墙纸，也不得把相册保存记为设置成功。动态效果仅支持锁屏。</div>
+  </section>
+
+  <section class="doc-section">
+    <h2>6. 已下载页面</h2>
+    <ul>
+      <li>数据以本机真实存在且校验有效的文件为准，不以服务端记录为准。</li>
+      <li>只保留"静态 / 动态"Tab，不增加频道筛选，不展示红点或数字角标。</li>
+      <li>本地文件缺失、损坏或服务端版本更新后，提示重新下载，不展示为可用状态。</li>
+      <li>线上壁纸下架后，本地有效文件可保留使用，但禁止发起新的下载。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>7. 下载状态与完整性校验</h2>
+    <ul>
+      <li>下载状态机：未下载 → 下载中 → 校验中 → 已下载 / 失败可重试；下载中禁止重复创建任务。</li>
+      <li>下载完成前必须校验文件大小、壁纸 ID、资源版本和服务端提供的哈希值。</li>
+      <li>校验失败立即删除临时文件，不写入已下载索引。</li>
+      <li>本地索引记录壁纸 ID、类型、资源版本、本地路径、校验值和下载时间。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>8. 动态视频规范</h2>
+    <ul>
+      <li>后台上传动态视频时长必须小于等于 5 秒，竖屏，帧率建议 24~30fps。</li>
+      <li>分辨率建议 1080×1920，不包含需要播放的音频。</li>
+      <li>服务端输出：Android 为 H.264 MP4（循环播放），iOS 为统一约 3 秒 Live Photo 配对资源。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>9. 后台内容规则</h2>
+    <ul>
+      <li>后台导航仅包含"频道管理 / 壁纸列表 / 交互说明"三项。</li>
+      <li><strong>频道管理：</strong>列表展示频道名称、排序、各类型壁纸数量、有效时间和状态；"新增频道"弹窗配置频道名称与生效时间（上线/下线时间），新增和编辑共用弹窗；频道启停通过修改有效时间控制，不设独立停用按钮。</li>
+      <li><strong>壁纸列表：</strong>展示全部已配置壁纸，支持类型、频道、发布状态、资源状态和名称筛选，支持分页；列表包含"使用人数"列（服务端按下载按钮点击 UV 去重统计）；"添加壁纸"按钮打开新增/编辑共用弹窗；操作列为编辑和删除（资源失败时额外提供重试）；不设独立上线/下线按钮，上下线通过修改生效时间控制。</li>
+      <li>频道和单张壁纸均支持通过生效时间控制上下线，频道支持人工排序。</li>
+      <li>动态视频上传时长必须小于等于 5 秒。</li>
+      <li>动态壁纸保存后进入资源处理中；Android MP4 与 iOS Live Photo 双端资源全部成功后，按生效时间自动发布；资源就绪前发布状态为"待上线"。</li>
+      <li>从未发布的壁纸可物理删除；已发布壁纸可直接软删除。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>10. 异常处理要点</h2>
+    <ul>
+      <li>未登录、登录取消和令牌失效时，不得返回受保护内容。</li>
+      <li>频道或壁纸已下线时，停止浏览和下载，不主动删除用户本地文件。</li>
+      <li>平台资源生成中或失败时，仅向资源可用平台返回内容。</li>
+      <li>网络中断、下载地址过期、存储空间不足时给出明确提示并允许重试。</li>
+      <li>文件损坏或版本过旧时，清理无效文件并提示重新下载。</li>
+      <li>Android 设置取消或 WallpaperService 失败时，不得报告成功。</li>
+      <li>iOS 相册权限拒绝或受限时，不得写入，并引导用户前往系统设置开启。</li>
+      <li>后台保存校验失败时，一次性展示所有阻塞原因。</li>
+    </ul>
+  </section>
+
+  <section class="doc-section">
+    <h2>11. 一期不包含</h2>
+    <ul>
+      <li>游客浏览或下载。</li>
+      <li>用户上传、AI 生成、收藏和社区分享。</li>
+      <li>Android 锁屏壁纸或桌面/锁屏选择。</li>
+      <li>iOS 直接设置系统墙纸。</li>
+      <li>已下载跨设备同步。</li>
+      <li>正式 APP 中的 Android/iOS 手动切换（仅评审 Demo 提供切换演示）。</li>
+    </ul>
+  </section>
+</aside>
+
+<div class="toast" id="toast">✅ 操作成功</div>
+
+<div class="permission-overlay" id="permissionOverlay">
+  <div class="permission-card">
+    <div class="permission-title">允许访问相册？</div>
+    <div class="permission-desc">三国咸话需要访问相册，将生成的实况壁纸保存到系统相册。</div>
+    <div class="permission-actions">
+      <button class="permission-btn cancel" id="permissionCancel">暂不允许</button>
+      <button class="permission-btn allow" id="permissionAllow">允许访问</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============ 数据 ============
+  const ASSET_BASE = '演示素材/';
+  const wallpapers = [
+    { id: 1,  name: '曹操',    meta: '三国杀 · 魏',     cls: 'wp-1',  isNew: true,  ip: 'sgs', asset: '静态1.png' },
+    { id: 2,  name: '貂蝉',    meta: '三国杀 · 群',     cls: 'wp-2',  isNew: true,  ip: 'sgs', asset: '静态2.png' },
+    { id: 3,  name: '关羽',    meta: '三国杀 · 蜀',     cls: 'wp-3',  isNew: false, ip: 'sgs', asset: '静态3.png' },
+    { id: 4,  name: '游小婵',  meta: '虚拟形象 IP',     cls: 'wp-8',  isNew: true,  ip: 'yxx' },
+  ];
+
+  const dynamicWallpapers = [
+    { id: 101, name: '关羽·龙胆',    meta: '动态 · 5秒循环', cls: 'wp-3', isNew: true,  ip: 'sgs', asset: '动态1.mp4' },
+    { id: 102, name: '貂蝉·离间',    meta: '动态 · 4秒循环', cls: 'wp-2', isNew: true,  ip: 'sgs', asset: '动态1.mp4' },
+    { id: 103, name: '游小婵·日落',  meta: '动态 · 6秒循环', cls: 'wp-8', isNew: false, ip: 'yxx' },
+    { id: 104, name: '火烧赤壁',     meta: '动态 · 8秒循环', cls: 'wp-6', isNew: false, ip: 'sgs' },
+  ];
+  function isVideoAsset(path) { return path && path.endsWith('.mp4'); }
+  function assetUrl(path) { return path ? ASSET_BASE + path : ''; }
+
+  let downloadedIds = [3, 5];
+let currentSetId = null;  // 最近一次设置为壁纸的 wallpaper id
+  let currentTab = 'static';
+  let currentDownloadedTab = 'static';
+  let currentIp = 'all';
+  let currentPreviewId = null;
+  let currentPlatform = 'android';
+  let isDownloading = false;
+  let photoPermissionGranted = false;
+
+  // ============ 渲染 ============
+  function getDataSource() {
+    return currentTab === 'static' ? wallpapers : dynamicWallpapers;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    const source = getDataSource();
+    const filtered = source.filter(w => currentIp === 'all' || w.ip === currentIp);
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🎨</div><div class="empty-tip">该分类暂无${currentTab === 'static' ? '静态' : '动态'}壁纸<br>敬请期待</div></div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(w => {
+      const bgStyle = w.asset && !isVideoAsset(w.asset) ? `background-image:url(${assetUrl(w.asset)});background-size:cover;background-position:center` : '';
+      const playIcon = currentTab === 'dynamic' ? '<div class="play-icon">▶</div>' : '';
+      return `<div class="wallpaper-card ${w.cls}" style="${bgStyle}" onclick="openPreview(${w.id})">${playIcon}</div>`;
+    }).join('');
+  }
+
+  function renderDownloaded() {
+    const grid = document.getElementById('downloadedGrid');
+    const source = currentDownloadedTab === 'static' ? wallpapers : dynamicWallpapers;
+    const items = source.filter(w => downloadedIds.includes(w.id));
+
+    document.getElementById('dlCount').textContent = items.length + ' 张';
+
+    if (items.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-tip">还没有下载的${currentDownloadedTab === 'static' ? '静态' : '动态'}壁纸<br>去首页挑选喜欢的吧</div></div>`;
+      return;
+    }
+
+    grid.innerHTML = items.map(w => {
+      const bgStyle = w.asset && !isVideoAsset(w.asset) ? `background-image:url(${assetUrl(w.asset)});background-size:cover;background-position:center` : '';
+      const playIcon = currentDownloadedTab === 'dynamic' ? '<div class="play-icon">▶</div>' : '';
+      return `<div class="wallpaper-card ${w.cls}" style="${bgStyle}" onclick="openPreview(${w.id})">${playIcon}</div>`;
+    }).join('');
+  }
+
+  // ============ 页面切换 ============
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById(pageId).classList.remove('hidden');
+  }
+
+  function openPreview(id) {
+    const all = [...wallpapers, ...dynamicWallpapers];
+    const w = all.find(x => x.id === id);
+    if (!w) return;
+    currentPreviewId = id;
+
+    const bg = document.getElementById('previewBg');
+    const video = document.getElementById('previewVideo');
+    // 清理旧视频和图片
+    video.classList.remove('show');
+    video.src = '';
+    const oldImg = bg.querySelector('.preview-img');
+    if (oldImg) oldImg.remove();
+
+    bg.className = 'preview-bg ' + w.cls;
+
+    if (w.asset && isVideoAsset(w.asset)) {
+      // 动态壁纸：先加载再播放，绕过自动播放限制
+      video.src = assetUrl(w.asset);
+      video.classList.add('show');
+      video.currentTime = 0;
+      video.load();
+      video.oncanplay = () => { video.play().catch(() => {}); };
+      // 兜底：canplay 未触发时也尝试播放
+      setTimeout(() => { if (video.paused && video.src) video.play().catch(() => {}); }, 200);
+    } else if (w.asset) {
+      // 静态壁纸：真实图片背景
+      const img = document.createElement('div');
+      img.className = 'preview-img';
+      img.style.backgroundImage = `url(${assetUrl(w.asset)})`;
+      bg.appendChild(img);
+    }
+
+    document.getElementById('previewName').textContent = w.name;
+    document.getElementById('previewMeta').textContent = w.meta;
+
+    // 重置进度状态
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressText').textContent = '';
+    document.getElementById('progressWrap').classList.remove('show');
+    isDownloading = false;
+
+    updatePreviewForPlatform();
+    showPage('previewPage');
+  }
+
+  function closePreview() {
+    const video = document.getElementById('previewVideo');
+    video.pause();
+    video.src = '';
+    video.classList.remove('show');
+    showPage('mainPage');
+  }
+
+  // 根据当前平台更新预览页文案
+  function updatePreviewForPlatform() {
+    const setBtn = document.getElementById('setBtn');
+    const iosHint = document.getElementById('iosHint');
+    const id = currentPreviewId;
+    const isDownloaded = id && downloadedIds.includes(id);
+    const isCurrent = id && id === currentSetId;
+
+    if (currentPlatform === 'ios') {
+      iosHint.classList.add('show');
+      if (!isDownloaded)       setBtn.textContent = '下载并生成实况壁纸';
+      else if (isCurrent)      setBtn.textContent = '实况壁纸已保存到相册';
+      else                     setBtn.textContent = '生成实况壁纸';
+    } else {
+      iosHint.classList.remove('show');
+      if (!isDownloaded)       setBtn.textContent = '下载并设置为壁纸';
+      else if (isCurrent)      setBtn.textContent = '已设置为壁纸';
+      else                     setBtn.textContent = '设置为壁纸';
+    }
+  }
+
+  // ============ 事件 ============
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentTab = this.dataset.tab;
+      renderGrid();
+    });
+  });
+
+  document.querySelectorAll('.ip-tag').forEach(tag => {
+    tag.addEventListener('click', function() {
+      document.querySelectorAll('.ip-tag').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentIp = this.dataset.ip;
+      renderGrid();
+    });
+  });
+
+  // 已下载页分类切换
+  document.querySelectorAll('.downloaded-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.downloaded-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentDownloadedTab = this.dataset.downloadedTab;
+      renderDownloaded();
+    });
+  });
+  // 平台切换（Android / iOS）
+  document.querySelectorAll('.platform-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      if (isDownloading) {
+        toast('⏳ 下载进行中，请稍候');
+        return;
+      }
+      document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentPlatform = this.dataset.platform;
+      updatePreviewForPlatform();
+    });
+  });
+
+  // 主按钮：触发下载 / 直接设置
+  document.getElementById('setBtn').addEventListener('click', function() {
+    if (isDownloading || !currentPreviewId) return;
+    trackDownloadTap(currentPreviewId, currentPlatform);
+    if (currentPlatform === 'ios' && !photoPermissionGranted) {
+      document.getElementById('permissionOverlay').classList.add('show');
+      return;
+    }
+    // 已下载：直接设置，不再走下载进度
+    if (downloadedIds.includes(currentPreviewId)) {
+      quickSet();
+      return;
+    }
+    startDownload();
+  });
+
+  // 模拟下载按钮埋点上报（点击即上报一次，服务端按登录态去重统计 UV）
+  function trackDownloadTap(wallpaperId, platform) {
+    console.log('[埋点] wallpaper_download_tap', { wallpaper_id: wallpaperId, platform, ts: Date.now() });
+  }
+
+  document.getElementById('permissionCancel').addEventListener('click', function() {
+    document.getElementById('permissionOverlay').classList.remove('show');
+    toast('已取消相册授权');
+  });
+
+  document.getElementById('permissionAllow').addEventListener('click', function() {
+    photoPermissionGranted = true;
+    document.getElementById('permissionOverlay').classList.remove('show');
+    startDownload();
+  });
+
+  // 已下载壁纸直接设置（不走下载进度）
+  function quickSet() {
+    currentSetId = currentPreviewId;
+    updatePreviewForPlatform();
+    if (currentPlatform === 'ios') {
+      toast('✅ 实况壁纸已保存到相册\n动态效果仅支持锁屏，请前往「设置 → 墙纸」中手动应用');
+    } else {
+      toast('✅ 已设置为主屏壁纸');
+    }
+  }
+
+  // 开始下载（模拟三段切图进度：30% / 70% / 100%）
+  function startDownload() {
+    isDownloading = true;
+    const setBtn = document.getElementById('setBtn');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
+    setBtn.style.pointerEvents = 'none';
+    setBtn.style.opacity = '0.55';
+    progressWrap.classList.add('show');
+
+    let progress = 0;
+    const tick = setInterval(() => {
+      // 进度递增：前段快，后段略慢，模拟真实下载
+      let step = 3 + Math.random() * 6;
+      if (progress > 70) step = 2 + Math.random() * 3;
+      progress = Math.min(100, Math.floor(progress + step));
+
+      progressFill.style.width = progress + '%';
+      progressText.textContent = currentPlatform === 'ios'
+        ? '正在下载实况壁纸资源 ' + progress + '%'
+        : '下载中 ' + progress + '%';
+
+      // 切图状态提示
+      if (progress === 30) {
+        progressText.textContent = currentPlatform === 'ios'
+          ? '正在下载实况壁纸资源'
+          : '已下载 30% · 预览就绪';
+      } else if (progress === 70) {
+        progressText.textContent = currentPlatform === 'ios'
+          ? '正在保存实况壁纸到相册'
+          : '已下载 70% · 即将完成';
+      } else if (progress >= 100) {
+        clearInterval(tick);
+        onDownloadComplete();
+      }
+    }, 100);
+  }
+
+  // 下载完成
+  function onDownloadComplete() {
+    isDownloading = false;
+    const setBtn = document.getElementById('setBtn');
+    const progressWrap = document.getElementById('progressWrap');
+    const progressText = document.getElementById('progressText');
+
+    setBtn.style.pointerEvents = 'auto';
+    setBtn.style.opacity = '1';
+    progressText.textContent = currentPlatform === 'ios'
+      ? '实况壁纸已保存到相册'
+      : '下载完成 ✅';
+
+    if (!downloadedIds.includes(currentPreviewId)) {
+      downloadedIds.push(currentPreviewId);
+    }
+    currentSetId = currentPreviewId;
+    renderDownloaded();
+
+    // 按钮文案变为已下载状态
+    updatePreviewForPlatform();
+
+    setTimeout(() => {
+      if (currentPlatform === 'android') {
+        toast('✅ 已设置为主屏壁纸');
+      } else {
+        toast('✅ 实况壁纸已保存到相册\n动态效果仅支持锁屏，请前往「设置 → 墙纸」中手动应用');
+      }
+      progressWrap.classList.remove('show');
+    }, 700);
+  }
+
+  // ============ Toast ============
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 1600);
+  }
+
+  // ============ 初始化 ============
+  renderGrid();
+  renderDownloaded();
+</script>
+
+</body>
+</html>
